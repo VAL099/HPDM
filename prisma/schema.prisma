@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// docker run --name hpdm -p 5111:5432 -e POSTGRES_PASSWORD=secret -d postgres
+// npx prisma migrate dev --name init
+// npx prisma db push
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model StaffType {
+  id        Int       @default(autoincrement()) @id
+  name      String
+  workers   Staff[]
+}
+
+model Staff {
+  id          Int             @default(autoincrement()) @id
+  name        String
+  email       String          @unique
+  roleId      Int
+  role        StaffType       @relation(fields: [roleId], references: [id])
+  description String? // data will be stored as formatted html string
+  createdAt   DateTime        @default(now())
+}
