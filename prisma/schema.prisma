@@ -28,19 +28,22 @@ datasource db {
 // }
 
 model Staff {
-  id         Int      @id @default(autoincrement())
-  name       String
-  idnp       String   @unique
-  email      String   @unique
-  clinicId   Int
+  id        Int      @id @default(autoincrement())
+  name      String
+  idnp      String   @unique
+  email     String   @unique
   // role        Role            @relation(fields: [roleId], references: [id])
-  employedAt Clinic   @relation(fields: [clinicId], references: [id])
-  createdAt  DateTime @default(now())
+  createdAt DateTime @default(now())
 
-  details  StaffDetails?
-  Visit    Visit[]
-  Writings MedicalCardRecord[]
-  Files    InvestigationFiles[]
+  details               StaffDetails?
+  visit                 ClinicVisits[]
+  writings              MedicalCardRecord[]
+  files                 InvestigationFiles[]
+  emitedRecipes         Recipe[]
+  employeedAtClinic     ClinicEmployees[]
+  employeedAtLaboratory LaboratoryEmployees[]
+  employeedAtPharmacy   PharmacyEmployees[]
+  closedRecipes         ClosesRecipes[]
 }
 
 model StaffDetails {
@@ -110,9 +113,21 @@ model Clinic {
   city     String
   district String
 
-  employees Staff[]
+  employees ClinicEmployees[]
   details   ClinicDetails?
-  Visit     Visit[]
+  visit     ClinicVisits[]
+}
+
+model ClinicEmployees {
+  id       Int @id @default(autoincrement())
+  clinicId Int
+  staffId  Int
+
+  clinic Clinic @relation(fields: [clinicId], references: [id])
+  staff  Staff  @relation(fields: [staffId], references: [id])
+
+  @@index([clinicId], name: "clinicEmployee_idx")
+  @@index([staffId], name: "staffEmployee_idx")
 }
 
 model ClinicDetails {
@@ -186,9 +201,11 @@ model Patient {
   country     String?
   createdAt   DateTime @default(now())
 
-  details PatientDetails?
-  card    MedicalCard?
-  Visit   Visit[]
+  details       PatientDetails?
+  card          MedicalCard?
+  visits        ClinicVisits[]
+  recipes       Recipe[]
+  closedRecipes ClosesRecipes[]
 
   @@index([idnp], name: "idnp_idx")
 }
@@ -213,7 +230,7 @@ model MedicalCard {
   patient Patient             @relation(fields: [patientId], references: [id])
   content MedicalCardRecord[]
 
-  @@index([patientId], name: "patientId_idx")
+  @@index([patientId], name: "patientCard_idx")
 }
 
 model MedicalCardRecord {
@@ -245,14 +262,14 @@ model InvestigationFiles {
   createdBy Staff             @relation(fields: [staffId], references: [id])
 }
 
-model Visit {
+model ClinicVisits {
   id           Int      @id @default(autoincrement())
   patientId    Int
   clinicId     Int
   staffId      Int
   date         DateTime
   reason       String // reason for the visit aka simptoms etc...
-  diagnosis    String
+  diagnosis    String? // may be set dependiong on the visit reason
   treatment    String? // html formatted string
   prescription String? // html formatted string
   notes        String? // html formatted string
@@ -262,8 +279,79 @@ model Visit {
   staff   Staff   @relation(fields: [staffId], references: [id])
 }
 
-// CLINIC STAFF AND PATIENT DONE
-// TODO: 
-// Laboratory
-// Pharmacy
-// 
+model Recipe {
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  staffId      Int
+  date         DateTime
+  medicineName String // html formatted string
+  quantity     Int
+  measure      String
+  instructions String? // html formatted string
+  notes        String? // html formatted string
+
+  patient       Patient         @relation(fields: [patientId], references: [id])
+  staff         Staff           @relation(fields: [staffId], references: [id])
+  closedRecipes ClosesRecipes[]
+
+  @@index([patientId], name: "patientRecipe_idx")
+  @@index([staffId], name: "staffRecipe_idx")
+  @@index([medicineName], name: "medicineNameRecipe_idx")
+}
+
+model Laboratory {
+  id       Int    @id @default(autoincrement())
+  name     String
+  address  String
+  city     String
+  district String
+
+  services  Services[]
+  employees LaboratoryEmployees[]
+}
+
+model LaboratoryEmployees {
+  id      Int @id @default(autoincrement())
+  labId   Int
+  staffId Int
+
+  lab   Laboratory @relation(fields: [labId], references: [id])
+  staff Staff      @relation(fields: [staffId], references: [id])
+}
+
+model Pharmacy {
+  id       Int    @id @default(autoincrement())
+  name     String
+  address  String
+  city     String
+  district String
+
+  employees PharmacyEmployees[]
+}
+
+model PharmacyEmployees {
+  id         Int @id @default(autoincrement())
+  pharmacyId Int
+  staffId    Int
+
+  pharmacy Pharmacy @relation(fields: [pharmacyId], references: [id])
+  staff    Staff    @relation(fields: [staffId], references: [id])
+}
+
+model ClosesRecipes {
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  staffId      Int
+  recipeId     Int
+  date         DateTime
+  medicine     String
+  soldQuantity Int
+  measure      String
+  notes        String?
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  staff   Staff   @relation(fields: [staffId], references: [id])
+  recipe  Recipe  @relation(fields: [recipeId], references: [id])
+}
+
+// SCHEDULES LEFT TO IMPLEMENT
