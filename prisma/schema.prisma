@@ -7,6 +7,7 @@
 // docker run --name hpdm -p 5111:5432 -e POSTGRES_PASSWORD=secret -d postgres
 // npx prisma migrate dev --name init
 // npx prisma db push
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -16,18 +17,253 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model StaffType {
-  id        Int       @default(autoincrement()) @id
-  name      String
-  workers   Staff[]
-}
+// HERE IT STARTS
+// model Role {
+//   id          Int             @id @default(autoincrement())
+//   name        String          @unique
+//   description String?
+//   createdAt   DateTime        @default(now())
+
+//   staff       Staff[]
+// }
 
 model Staff {
-  id          Int             @default(autoincrement()) @id
-  name        String
-  email       String          @unique
-  roleId      Int
-  role        StaffType       @relation(fields: [roleId], references: [id])
-  description String? // data will be stored as formatted html string
-  createdAt   DateTime        @default(now())
+  id         Int      @id @default(autoincrement())
+  name       String
+  idnp       String   @unique
+  email      String   @unique
+  clinicId   Int
+  // role        Role            @relation(fields: [roleId], references: [id])
+  employedAt Clinic   @relation(fields: [clinicId], references: [id])
+  createdAt  DateTime @default(now())
+
+  details  StaffDetails?
+  Visit    Visit[]
+  Writings MedicalCardRecord[]
+  Files    InvestigationFiles[]
 }
+
+model StaffDetails {
+  id                    Int              @id @default(autoincrement())
+  staffId               Int              @unique
+  phoneNumber           String // optional phone number field
+  dateOfBirth           DateTime
+  gender                String?
+  position              Position // require a separate table for flexibility, or remove this and use role table and field instead
+  department            Departments // require a separate table for flexibility
+  hireDate              DateTime?
+  status                EmploymentStatus
+  address               String?
+  city                  String?
+  district              String?
+  postalCode            String?
+  country               String?
+  emergencyContactName  String? // person to contact in case of emergency
+  emergencyContactPhone String? // phone number of the emergency contact
+  description           String? // data will be stored as formatted html string
+  qualifications        String? // data can be stored as formatted html string
+  notes                 String? // optional notes
+
+  staff Staff @relation(fields: [staffId], references: [id])
+}
+
+enum EmploymentStatus {
+  ACTIVE
+  INACTIVE
+  TERMINATED
+  RETIRED
+  PROBATION
+  CONTRACT
+  VACATION
+  LEAVE_OF_ABSENCE
+  OTHER
+}
+
+enum Departments {
+  ADMINISTRATION
+  HUMAN_RESOURCES
+  LABORATORY
+  CLINICS
+  PHARMACY
+  OTHER
+}
+
+enum Position {
+  DOCTOR
+  NURSE
+  TECHNICIAN
+  ADMINISTRATOR
+  RECEPTIONIST
+  PHARMACIST
+  LABORATORY_TECHNICIAN
+  CLEANER
+  SECURITY
+  DRIVER
+  FAMILY_DOCTOR
+  OTHER
+}
+
+model Clinic {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  address  String @unique
+  city     String
+  district String
+
+  employees Staff[]
+  details   ClinicDetails?
+  Visit     Visit[]
+}
+
+model ClinicDetails {
+  id                Int               @id @default(autoincrement())
+  clinicId          Int               @unique
+  phoneNumber       String
+  email             String
+  website           String
+  openingHours      String
+  services          Services[]
+  specializations   Specializations[]
+  numberOfEmployees Int
+  numberOfStaff     Int
+  notes             String?
+
+  clinic Clinic @relation(fields: [clinicId], references: [id])
+}
+
+enum Services {
+  CONSULTATION
+  DIAGNOSTICS
+  SURGERY
+  VACCINATION
+  PHYSIOTHERAPY
+  LAB_TESTS
+  IMAGING
+  EMERGENCY_CARE
+  MATERNITY_CARE
+  PHARMACY
+  MENTAL_HEALTH
+  NUTRITION_AND_DIET
+  REHABILITATION
+  TELEMEDICINE
+  HOME_HEALTH_CARE
+  DENTAL_CARE
+  PRIMARY_CARE
+  SPECIALTY_CARE
+}
+
+enum Specializations {
+  CARDIOLOGY
+  DERMATOLOGY
+  NEUROLOGY
+  ORTHOPEDICS
+  PEDIATRICS
+  PSYCHIATRY
+  RADIOLOGY
+  ONCOLOGY
+  GASTROENTEROLOGY
+  UROLOGY
+  GYNECOLOGY
+  OPHTHALMOLOGY
+  ENT
+  PULMONOLOGY
+  ENDOCRINOLOGY
+  RHEUMATOLOGY
+  ALLERGY_AND_IMMUNOLOGY
+  FAMILY_MEDICINE
+}
+
+model Patient {
+  id          Int      @id @default(autoincrement())
+  name        String
+  idnp        String   @unique
+  email       String   @unique
+  phoneNumber String
+  address     String?
+  city        String?
+  district    String?
+  postalCode  String?
+  country     String?
+  createdAt   DateTime @default(now())
+
+  details PatientDetails?
+  card    MedicalCard?
+  Visit   Visit[]
+
+  @@index([idnp], name: "idnp_idx")
+}
+
+model PatientDetails {
+  id                 Int      @id @default(autoincrement())
+  patientId          Int      @unique
+  currentMedications String? // current medications, can be stored as formatted html string
+  allergies          String? // allergies, can be stored as formatted html string
+  notes              String? // optional notes
+  updatedAt          DateTime @updatedAt
+
+  patient Patient @relation(fields: [patientId], references: [id])
+}
+
+model MedicalCard {
+  id        Int      @id @default(autoincrement())
+  patientId Int      @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  patient Patient             @relation(fields: [patientId], references: [id])
+  content MedicalCardRecord[]
+
+  @@index([patientId], name: "patientId_idx")
+}
+
+model MedicalCardRecord {
+  id        Int      @id @default(autoincrement())
+  cardId    Int
+  date      DateTime
+  doctorId  Int
+  diagnosis String
+  treatment String? // html formatted string
+  notes     String? // html formatted string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  card   MedicalCard          @relation(fields: [cardId], references: [id])
+  doctor Staff                @relation(fields: [doctorId], references: [id])
+  files  InvestigationFiles[]
+}
+
+model InvestigationFiles {
+  id        Int      @id @default(autoincrement())
+  recordId  Int
+  staffId   Int
+  name      String
+  url       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  record    MedicalCardRecord @relation(fields: [recordId], references: [id])
+  createdBy Staff             @relation(fields: [staffId], references: [id])
+}
+
+model Visit {
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  clinicId     Int
+  staffId      Int
+  date         DateTime
+  reason       String // reason for the visit aka simptoms etc...
+  diagnosis    String
+  treatment    String? // html formatted string
+  prescription String? // html formatted string
+  notes        String? // html formatted string
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  clinic  Clinic  @relation(fields: [clinicId], references: [id])
+  staff   Staff   @relation(fields: [staffId], references: [id])
+}
+
+// CLINIC STAFF AND PATIENT DONE
+// TODO: 
+// Laboratory
+// Pharmacy
+// 
