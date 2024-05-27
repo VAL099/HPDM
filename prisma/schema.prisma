@@ -115,7 +115,8 @@ model Clinic {
 
   employees ClinicEmployees[]
   details   ClinicDetails?
-  visit     ClinicVisits[]
+  visits     ClinicVisits[]
+  schedules Schedule[] @relation("ClinicSchedules")
 }
 
 model ClinicEmployees {
@@ -308,6 +309,7 @@ model Laboratory {
 
   services  Services[]
   employees LaboratoryEmployees[]
+  schedules Schedule[] @relation("LaboratorySchedules")
 }
 
 model LaboratoryEmployees {
@@ -354,4 +356,24 @@ model ClosesRecipes {
   recipe  Recipe  @relation(fields: [recipeId], references: [id])
 }
 
-// SCHEDULES LEFT TO IMPLEMENT
+enum LocationType {
+  CLINIC
+  LABORATORY
+}
+
+model Schedule {
+  id Int @id @default(autoincrement())
+  locationId Int @unique
+  locationType LocationType
+  pacientId Int
+  staffId Int?
+  date DateTime
+  reason String // why the visit is scheduled
+  notes String?
+  isCompleted Boolean @default(false)
+
+  clinic      Clinic?    @relation("ClinicSchedules", fields: [locationId], references: [id], map: "ClinicLocationId_fkey")
+  laboratory  Laboratory? @relation("LaboratorySchedules", fields: [locationId], references: [id], map: "LaboratoryLocationId_fkey")
+
+  @@index([locationType, locationId])
+}

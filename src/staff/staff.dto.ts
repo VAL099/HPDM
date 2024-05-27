@@ -21,8 +21,4 @@ export class StaffDto{
     readonly description: string | null;
 }
 
-export class StaffRoleDto{
-    @IsString()
-    readonly name: string;
-}
 
