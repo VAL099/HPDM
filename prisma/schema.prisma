@@ -43,7 +43,7 @@ model Staff {
   employeedAtClinic     ClinicEmployees[]
   employeedAtLaboratory LaboratoryEmployees[]
   employeedAtPharmacy   PharmacyEmployees[]
-  closedRecipes         ClosesRecipes[]
+  closedRecipes         ClosedRecipes[]
 }
 
 model StaffDetails {
@@ -115,8 +115,8 @@ model Clinic {
 
   employees ClinicEmployees[]
   details   ClinicDetails?
-  visits     ClinicVisits[]
-  schedules Schedule[] @relation("ClinicSchedules")
+  visits    ClinicVisits[]
+  schedules Schedule[]        @relation("ClinicSchedules")
 }
 
 model ClinicEmployees {
@@ -145,6 +145,23 @@ model ClinicDetails {
   notes             String?
 
   clinic Clinic @relation(fields: [clinicId], references: [id])
+}
+
+model ClinicVisits {
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  clinicId     Int
+  staffId      Int
+  date         DateTime
+  reason       String // reason for the visit aka simptoms etc...
+  diagnosis    String? // may be set dependiong on the visit reason
+  treatment    String? // html formatted string
+  prescription String? // html formatted string
+  notes        String? // html formatted string
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  clinic  Clinic  @relation(fields: [clinicId], references: [id])
+  staff   Staff   @relation(fields: [staffId], references: [id])
 }
 
 enum Services {
@@ -206,7 +223,7 @@ model Patient {
   card          MedicalCard?
   visits        ClinicVisits[]
   recipes       Recipe[]
-  closedRecipes ClosesRecipes[]
+  closedRecipes ClosedRecipes[]
 
   @@index([idnp], name: "idnp_idx")
 }
@@ -250,6 +267,27 @@ model MedicalCardRecord {
   files  InvestigationFiles[]
 }
 
+model Laboratory {
+  id       Int    @id @default(autoincrement())
+  name     String
+  address  String
+  city     String
+  district String
+
+  services  Services[]
+  employees LaboratoryEmployees[]
+  schedules Schedule[]            @relation("LaboratorySchedules")
+}
+
+model LaboratoryEmployees {
+  id      Int @id @default(autoincrement())
+  labId   Int
+  staffId Int
+
+  lab   Laboratory @relation(fields: [labId], references: [id])
+  staff Staff      @relation(fields: [staffId], references: [id])
+}
+
 model InvestigationFiles {
   id        Int      @id @default(autoincrement())
   recordId  Int
@@ -261,64 +299,6 @@ model InvestigationFiles {
 
   record    MedicalCardRecord @relation(fields: [recordId], references: [id])
   createdBy Staff             @relation(fields: [staffId], references: [id])
-}
-
-model ClinicVisits {
-  id           Int      @id @default(autoincrement())
-  patientId    Int
-  clinicId     Int
-  staffId      Int
-  date         DateTime
-  reason       String // reason for the visit aka simptoms etc...
-  diagnosis    String? // may be set dependiong on the visit reason
-  treatment    String? // html formatted string
-  prescription String? // html formatted string
-  notes        String? // html formatted string
-
-  patient Patient @relation(fields: [patientId], references: [id])
-  clinic  Clinic  @relation(fields: [clinicId], references: [id])
-  staff   Staff   @relation(fields: [staffId], references: [id])
-}
-
-model Recipe {
-  id           Int      @id @default(autoincrement())
-  patientId    Int
-  staffId      Int
-  date         DateTime
-  medicineName String // html formatted string
-  quantity     Int
-  measure      String
-  instructions String? // html formatted string
-  notes        String? // html formatted string
-
-  patient       Patient         @relation(fields: [patientId], references: [id])
-  staff         Staff           @relation(fields: [staffId], references: [id])
-  closedRecipes ClosesRecipes[]
-
-  @@index([patientId], name: "patientRecipe_idx")
-  @@index([staffId], name: "staffRecipe_idx")
-  @@index([medicineName], name: "medicineNameRecipe_idx")
-}
-
-model Laboratory {
-  id       Int    @id @default(autoincrement())
-  name     String
-  address  String
-  city     String
-  district String
-
-  services  Services[]
-  employees LaboratoryEmployees[]
-  schedules Schedule[] @relation("LaboratorySchedules")
-}
-
-model LaboratoryEmployees {
-  id      Int @id @default(autoincrement())
-  labId   Int
-  staffId Int
-
-  lab   Laboratory @relation(fields: [labId], references: [id])
-  staff Staff      @relation(fields: [staffId], references: [id])
 }
 
 model Pharmacy {
@@ -340,7 +320,28 @@ model PharmacyEmployees {
   staff    Staff    @relation(fields: [staffId], references: [id])
 }
 
-model ClosesRecipes {
+model Recipe {
+  id           Int      @id @default(autoincrement())
+  patientId    Int
+  staffId      Int
+  date         DateTime
+  medicineName String // html formatted string
+  quantity     Int
+  measure      String
+  instructions String? // html formatted string
+  notes        String? // html formatted string
+  isActive     Boolean  @default(true)
+
+  patient       Patient         @relation(fields: [patientId], references: [id])
+  staff         Staff           @relation(fields: [staffId], references: [id])
+  closedRecipes ClosedRecipes[]
+
+  @@index([patientId], name: "patientRecipe_idx")
+  @@index([staffId], name: "staffRecipe_idx")
+  @@index([medicineName], name: "medicineNameRecipe_idx")
+}
+
+model ClosedRecipes {
   id           Int      @id @default(autoincrement())
   patientId    Int
   staffId      Int
@@ -362,18 +363,18 @@ enum LocationType {
 }
 
 model Schedule {
-  id Int @id @default(autoincrement())
-  locationId Int @unique
+  id           Int          @id @default(autoincrement())
+  locationId   Int          @unique
   locationType LocationType
-  pacientId Int
-  staffId Int?
-  date DateTime
-  reason String // why the visit is scheduled
-  notes String?
-  isCompleted Boolean @default(false)
+  pacientId    Int
+  staffId      Int?
+  date         DateTime
+  reason       String // why the visit is scheduled
+  notes        String?
+  isCompleted  Boolean      @default(false)
 
-  clinic      Clinic?    @relation("ClinicSchedules", fields: [locationId], references: [id], map: "ClinicLocationId_fkey")
-  laboratory  Laboratory? @relation("LaboratorySchedules", fields: [locationId], references: [id], map: "LaboratoryLocationId_fkey")
+  clinic     Clinic?     @relation("ClinicSchedules", fields: [locationId], references: [id], map: "ClinicLocationId_fkey")
+  laboratory Laboratory? @relation("LaboratorySchedules", fields: [locationId], references: [id], map: "LaboratoryLocationId_fkey")
 
   @@index([locationType, locationId])
 }
