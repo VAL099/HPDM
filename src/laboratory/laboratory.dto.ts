@@ -1,7 +1,6 @@
-import { IsInt, IsString } from "class-validator";
+import { IsString, IsInt } from "class-validator";
 
-
-export class PharmacyDto {
+export class Laboratory {
     @IsString()
     name: string;
 
@@ -15,10 +14,10 @@ export class PharmacyDto {
     district: string;
 }
 
-export class PharmacyEmployeesDto {
+export class LaboratoryEmployees {
     @IsInt()
-    pharmacyId: number;
+    labId: string;
 
     @IsInt()
-    staffId: number;
+    staffId: string;
 }

@@ -44,6 +44,7 @@ model Staff {
   employeedAtLaboratory LaboratoryEmployees[]
   employeedAtPharmacy   PharmacyEmployees[]
   closedRecipes         ClosedRecipes[]
+  investigations        Investigation[]
 }
 
 model StaffDetails {
@@ -219,11 +220,12 @@ model Patient {
   country     String?
   createdAt   DateTime @default(now())
 
-  details       PatientDetails?
-  card          MedicalCard?
-  visits        ClinicVisits[]
-  recipes       Recipe[]
-  closedRecipes ClosedRecipes[]
+  details         PatientDetails?
+  card            MedicalCard?
+  visits          ClinicVisits[]
+  recipes         Recipe[]
+  closedRecipes   ClosedRecipes[]
+  investigations  Investigation[]
 
   @@index([idnp], name: "idnp_idx")
 }
@@ -277,6 +279,7 @@ model Laboratory {
   services  Services[]
   employees LaboratoryEmployees[]
   schedules Schedule[]            @relation("LaboratorySchedules")
+  investigations Investigation[]
 }
 
 model LaboratoryEmployees {
@@ -286,6 +289,40 @@ model LaboratoryEmployees {
 
   lab   Laboratory @relation(fields: [labId], references: [id])
   staff Staff      @relation(fields: [staffId], references: [id])
+}
+
+enum InvestigationType {
+  BLOOD_ANALYSIS
+  URINE_ANALYSIS
+  STOOL_ANALYSIS
+  BIOPSY
+  IMAGING
+  ECG
+  EEG
+  ECHO
+  MRI
+  CT_SCAN
+  ULTRASOUND
+  X_RAY
+  ENDOSCOPY
+  COLONOSCOPY
+  OTHER
+}
+
+model Investigation {
+  id          Int      @id @default(autoincrement())
+  patientId   Int
+  labId       Int
+  staffId     Int
+  date        DateTime
+  type        InvestigationType
+  description String? // html formatted string
+  notes       String? // html formatted string
+  isDone      Boolean  @default(false)
+
+  patient Patient     @relation(fields: [patientId], references: [id])
+  lab     Laboratory  @relation(fields: [labId], references: [id])
+  staff   Staff       @relation(fields: [staffId], references: [id])
 }
 
 model InvestigationFiles {
