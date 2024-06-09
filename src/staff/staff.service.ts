@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
-import { StaffDto, StaffRoleDto } from './staff.dto';
+import { StaffDto, StaffDetailsDto } from './staff.dto';
 
 @Injectable()
 export class StaffService {
@@ -12,22 +12,35 @@ export class StaffService {
         });
     }
 
-    async get() {
+    async getAll() {
         return this.prisma.staff.findMany();
+    }
+
+    async getByIdnp(idnp: string) {
+        return this.prisma.staff.findUnique({
+            where: { idnp: idnp, }
+        })
     }
 }
 
 @Injectable()
-export class StaffRoleService {
+export class StaffDetailsService {
     constructor(private prisma: PrismaService) {}
     
-    async create(dto: StaffRoleDto) {
-        return this.prisma.staffType.create({
+    async create(dto: StaffDetailsDto) {
+        return this.prisma.staffDetails.create({
             data: dto,
         });
     }
 
-    async get(){
-        return this.prisma.staffType.findMany();
+    async getAll() {
+        return this.prisma.staffDetails.findMany();
+    }
+
+    async getById(id: number) {
+        return this.prisma.staffDetails.findUnique({
+            where: { staffId: id, },
+        });
     }
 }
+

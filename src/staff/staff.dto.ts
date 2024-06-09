@@ -1,20 +1,21 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { IsInt, IsString, IsOptional, IsPhoneNumber, Matches, IsNotEmpty, IsEnum, IsDate } from "class-validator";
 
 export class StaffDto{
+    @ApiProperty()
     @IsString()
     readonly name: string;
 
+    @ApiProperty()
     @IsString()
     // @Length(13, 13)
     @Matches(/^\d{13}$/, { message: 'IDNP must be a 13-digit number' })
     readonly idnp: string;
 
+    @ApiProperty()
     @IsString()
     @Matches(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, { message: 'Email is invalid' })
     readonly email: string;
-
-    @IsInt()
-    readonly details: StaffDetailsDto;
 }
 
 export enum EmploymentStatus {
@@ -55,75 +56,90 @@ export enum Position {
 
 
 export class StaffDetailsDto{
-    @IsInt()
-    id: number;
-
+    @ApiProperty()
     @IsInt()
     staffId: number;
 
+    @ApiProperty()
     @IsOptional()
-    @IsPhoneNumber(null)
-    phoneNumber?: string;
+    @IsPhoneNumber('MD', { message: 'Phone number must be a valid Moldovian phone number' })
+    phoneNumber: string;
 
+    @ApiProperty()
     @IsDate()
     dateOfBirth: Date;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     gender?: string;
 
+    @ApiProperty()
     @IsNotEmpty()
     @IsEnum(Position)
-    position: string;
+    position: Position;
 
+    @ApiProperty()
     @IsNotEmpty()
     @IsEnum(Departments)
-    department: string; 
+    department: Departments; 
 
+    @ApiProperty()
     @IsOptional()
     @IsDate()
     hireDate?: Date;
 
+    @ApiProperty()
     @IsNotEmpty()
     @IsEnum(EmploymentStatus)
-    status: string; 
+    status: EmploymentStatus; 
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     address?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     city?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     district?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     postalCode?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     country?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     emergencyContactName?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsPhoneNumber(null)
     emergencyContactPhone?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     description?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     qualifications?: string;
 
+    @ApiProperty()
     @IsOptional()
     @IsString()
     notes?: string;

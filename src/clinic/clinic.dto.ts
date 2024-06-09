@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsString, IsOptional, IsArray, IsEnum, IsDate } from 'class-validator';
 
 export enum Services {
@@ -43,67 +44,78 @@ export enum Specializations {
 }
 
 export class ClinicDTO {
-    @IsInt()
-    id: number;
 
+    @ApiProperty()
     @IsString()
     name: string;
 
+    @ApiProperty()
     @IsString()
     address: string;
 
+    @ApiProperty()
     @IsString()
     city: string;
 
+    @ApiProperty()
     @IsString()
     district: string;
 }
 
 export class ClinicDetailsDTO {
-    @IsInt()
-    id: number;
 
+    @ApiProperty()
     @IsInt()
     clinicId: number;
 
+    @ApiProperty()
     @IsString()
     phoneNumber: string;
 
+    @ApiProperty()
     @IsString()
     email: string;
 
+    @ApiProperty()
     @IsString()
     website: string;
 
+    @ApiProperty()
     @IsString()
     openingHours: string;
 
+    @ApiProperty()
     @IsArray()
     @IsEnum(Services, { each: true })
     services: Services[];
 
+    @ApiProperty()
     @IsArray()
     @IsEnum(Specializations, { each: true })
     specializations: Specializations[];
 
+    @ApiProperty()
     @IsInt()
     numberOfEmployees: number;
 
+    @ApiProperty()
     @IsInt()
     numberOfStaff: number;
 
+    @ApiProperty()
     @IsString()
     @IsOptional()
     notes?: string;
 }
 
 export class ClinicEmployeesDTO {
-    @IsInt()
-    id: number;
-
+    
+    @ApiProperty({'description': 'Take this from `/clinic` endpoint'})
     @IsInt()
     clinicId: number;
 
+    @ApiProperty({'description': 'Take this from `/staff` endpoint'})
+    @ApiProperty()
     @IsInt()
     staffId: number;
 }

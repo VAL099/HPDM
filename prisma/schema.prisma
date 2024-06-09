@@ -50,7 +50,7 @@ model Staff {
 model StaffDetails {
   id                    Int              @id @default(autoincrement())
   staffId               Int              @unique
-  phoneNumber           String // optional phone number field
+  phoneNumber           String 
   dateOfBirth           DateTime
   gender                String?
   position              Position // require a separate table for flexibility, or remove this and use role table and field instead
@@ -122,8 +122,8 @@ model Clinic {
 
 model ClinicEmployees {
   id       Int @id @default(autoincrement())
-  clinicId Int
-  staffId  Int
+  clinicId Int @unique
+  staffId  Int @unique
 
   clinic Clinic @relation(fields: [clinicId], references: [id])
   staff  Staff  @relation(fields: [staffId], references: [id])
@@ -150,7 +150,7 @@ model ClinicDetails {
 
 model ClinicVisits {
   id           Int      @id @default(autoincrement())
-  patientId    Int
+  pacientId    Int
   clinicId     Int
   staffId      Int
   date         DateTime
@@ -160,7 +160,7 @@ model ClinicVisits {
   prescription String? // html formatted string
   notes        String? // html formatted string
 
-  patient Patient @relation(fields: [patientId], references: [id])
+  pacient Pacient @relation(fields: [pacientId], references: [id])
   clinic  Clinic  @relation(fields: [clinicId], references: [id])
   staff   Staff   @relation(fields: [staffId], references: [id])
 }
@@ -207,7 +207,7 @@ enum Specializations {
   FAMILY_MEDICINE
 }
 
-model Patient {
+model Pacient {
   id          Int      @id @default(autoincrement())
   name        String
   idnp        String   @unique
@@ -220,7 +220,7 @@ model Patient {
   country     String?
   createdAt   DateTime @default(now())
 
-  details         PatientDetails?
+  details         PacientDetails?
   card            MedicalCard?
   visits          ClinicVisits[]
   recipes         Recipe[]
@@ -228,29 +228,31 @@ model Patient {
   investigations  Investigation[]
 
   @@index([idnp], name: "idnp_idx")
+	@@map("Pacient")
 }
 
-model PatientDetails {
+model PacientDetails {
   id                 Int      @id @default(autoincrement())
-  patientId          Int      @unique
+  pacientId          Int      @unique
   currentMedications String? // current medications, can be stored as formatted html string
   allergies          String? // allergies, can be stored as formatted html string
   notes              String? // optional notes
   updatedAt          DateTime @updatedAt
 
-  patient Patient @relation(fields: [patientId], references: [id])
+  pacient Pacient @relation(fields: [pacientId], references: [id])
+	@@map("PacientDetails")
 }
 
 model MedicalCard {
   id        Int      @id @default(autoincrement())
-  patientId Int      @unique
+  pacientId Int      @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  patient Patient             @relation(fields: [patientId], references: [id])
+  pacient Pacient             @relation(fields: [pacientId], references: [id])
   content MedicalCardRecord[]
 
-  @@index([patientId], name: "patientCard_idx")
+  @@index([pacientId], name: "pacientCard_idx")
 }
 
 model MedicalCardRecord {
@@ -311,7 +313,7 @@ enum InvestigationType {
 
 model Investigation {
   id          Int      @id @default(autoincrement())
-  patientId   Int
+  pacientId   Int
   labId       Int
   staffId     Int
   date        DateTime
@@ -320,7 +322,7 @@ model Investigation {
   notes       String? // html formatted string
   isDone      Boolean  @default(false)
 
-  patient Patient     @relation(fields: [patientId], references: [id])
+  pacient Pacient     @relation(fields: [pacientId], references: [id])
   lab     Laboratory  @relation(fields: [labId], references: [id])
   staff   Staff       @relation(fields: [staffId], references: [id])
 }
@@ -359,7 +361,7 @@ model PharmacyEmployees {
 
 model Recipe {
   id           Int      @id @default(autoincrement())
-  patientId    Int
+  pacientId    Int
   staffId      Int
   date         DateTime
   medicineName String // html formatted string
@@ -369,18 +371,18 @@ model Recipe {
   notes        String? // html formatted string
   isActive     Boolean  @default(true)
 
-  patient       Patient         @relation(fields: [patientId], references: [id])
+  pacient       Pacient         @relation(fields: [pacientId], references: [id])
   staff         Staff           @relation(fields: [staffId], references: [id])
   closedRecipes ClosedRecipes[]
 
-  @@index([patientId], name: "patientRecipe_idx")
+  @@index([pacientId], name: "pacientRecipe_idx")
   @@index([staffId], name: "staffRecipe_idx")
   @@index([medicineName], name: "medicineNameRecipe_idx")
 }
 
 model ClosedRecipes {
   id           Int      @id @default(autoincrement())
-  patientId    Int
+  pacientId    Int
   staffId      Int
   recipeId     Int
   date         DateTime
@@ -389,7 +391,7 @@ model ClosedRecipes {
   measure      String
   notes        String?
 
-  patient Patient @relation(fields: [patientId], references: [id])
+  pacient Pacient @relation(fields: [pacientId], references: [id])
   staff   Staff   @relation(fields: [staffId], references: [id])
   recipe  Recipe  @relation(fields: [recipeId], references: [id])
 }
