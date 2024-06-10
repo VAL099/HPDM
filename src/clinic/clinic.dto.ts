@@ -44,7 +44,6 @@ export enum Specializations {
 }
 
 export class ClinicDTO {
-
     @ApiProperty()
     @IsString()
     name: string;

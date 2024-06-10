@@ -1,8 +1,9 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { InvestigationService, InvestigationFilesService } from './investigation.service';
 import { InvestigationDTO, InvestigationFilesDTO } from './investigation.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('investigation')
 @Controller('investigation')
 export class InvestigationController {
   constructor(

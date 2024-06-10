@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsDate, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 
 enum LocationType {
@@ -5,29 +6,37 @@ enum LocationType {
     LABORATORY = 'LABORATORY',
 }
 
-export class Schedule {
+export class ScheduleDTO {
     @IsInt()
+    @ApiProperty()
     locationId: number;
 
     @IsEnum(LocationType)
+    @ApiProperty()
     locationType: LocationType;
 
     @IsInt()
-    patientId: number;
+    @ApiProperty()
+    pacientId: number;
 
     @IsInt()
+    @ApiProperty()
     staffId: number;
 
     @IsDate()
+    @ApiProperty()
     date: Date;
 
     @IsString()
+    @ApiProperty()
     reason: string;
 
     @IsString()
     @IsOptional()
+    @ApiProperty()
     notes?: string;
 
     @IsBoolean()
+    @ApiProperty()
     isCompleted: boolean;
 }

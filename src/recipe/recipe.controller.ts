@@ -1,8 +1,9 @@
 import { Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { RecipeService, ClosedRecipeService } from './recipe.service';
 import { ClosedRecipesDTO, RecipeDTO } from './recipe.dto';
-import { ApiBody } from '@nestjs/swagger';
+import { ApiBody, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('recipe')
 @Controller('recipe')
 export class RecipeController {
   constructor(
