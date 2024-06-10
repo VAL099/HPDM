@@ -312,10 +312,10 @@ enum InvestigationType {
 }
 
 model Investigation {
-  id          Int      @id @default(autoincrement())
-  pacientId   Int
-  labId       Int
-  staffId     Int
+  id          Int       @id @default(autoincrement())
+  pacientId   Int       @unique
+  labId       Int       @unique
+  staffId     Int       @unique
   date        DateTime
   type        InvestigationType
   description String? // html formatted string
@@ -328,9 +328,9 @@ model Investigation {
 }
 
 model InvestigationFiles {
-  id        Int      @id @default(autoincrement())
-  recordId  Int
-  staffId   Int
+  id        Int       @id @default(autoincrement())
+  recordId  Int       @unique
+  staffId   Int       @unique
   name      String
   url       String
   createdAt DateTime @default(now())

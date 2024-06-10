@@ -1,23 +1,30 @@
+import { ApiProperty } from "@nestjs/swagger";
 import { IsString, IsInt } from "class-validator";
 
-export class Laboratory {
+export class LaboratoryDTO {
     @IsString()
+    @ApiProperty()
     name: string;
 
     @IsString()
+    @ApiProperty()
     address: string;
 
     @IsString()
+    @ApiProperty()
     city: string;
 
     @IsString()
+    @ApiProperty()
     district: string;
 }
 
-export class LaboratoryEmployees {
+export class LaboratoryEmployeesDTO {
     @IsInt()
-    labId: string;
+    @ApiProperty()
+    labId: number;
 
     @IsInt()
-    staffId: string;
+    @ApiProperty()
+    staffId: number;
 }

@@ -2,7 +2,7 @@ import { IsBoolean, IsDate, IsInt, IsOptional, IsString, } from "class-validator
 
 export class RecipeDTO {
     @IsInt()
-    patientId: number;
+    pacientId: number;
 
     @IsInt()
     staffId: number;
@@ -34,7 +34,7 @@ export class RecipeDTO {
 
 export class ClosedRecipesDTO {
     @IsInt()
-    patientId: number;
+    pacientId: number;
 
     @IsInt()
     staffId: number;
