@@ -11,10 +11,13 @@ import { CardModule } from './card/card.module';
 import { InvestigationModule } from './investigation/investigation.module';
 import { RecipeModule } from './recipe/recipe.module';
 import { VisitsModule } from './visits/visits.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [StaffModule, ClinicModule, ScheduleModule, LaboratoryModule, PacientModule, 
-              PharmacyModule, VisitsModule, RecipeModule, InvestigationModule, CardModule],
+              PharmacyModule, VisitsModule, RecipeModule, InvestigationModule, CardModule, AuthModule, 
+              ConfigModule.forRoot({isGlobal: true})],
   controllers: [AppController],
   providers: [AppService],
 })

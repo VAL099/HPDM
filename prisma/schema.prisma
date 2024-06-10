@@ -18,21 +18,24 @@ datasource db {
 }
 
 // HERE IT STARTS
-// model Role {
-//   id          Int             @id @default(autoincrement())
-//   name        String          @unique
-//   description String?
-//   createdAt   DateTime        @default(now())
 
-//   staff       Staff[]
-// }
+enum Role {
+  Staff
+  Pacient
+}
+
+model users {
+  id        Int      @id @default(autoincrement())
+  idnp      String   @unique
+  password  String
+  role      Role
+}
 
 model Staff {
   id        Int      @id @default(autoincrement())
   name      String
   idnp      String   @unique
   email     String   @unique
-  // role        Role            @relation(fields: [roleId], references: [id])
   createdAt DateTime @default(now())
 
   details               StaffDetails?
