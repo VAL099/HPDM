@@ -1,0 +1,1 @@
+docker-compose up -d --scale backend=2 --scale citus_worker=2
