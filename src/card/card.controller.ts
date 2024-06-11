@@ -19,14 +19,24 @@ export class CardController {
     return await this.cardService.create(dto);
   }
 
-  @Get(':cardId')
-  async cardById(@Param('id', ParseIntPipe) cardId: number){
-    return await this.cardService.getById(cardId);
+  @Get('pacient/:pacientId')
+  async cardByPacient(@Param('pacientId', ParseIntPipe) pacientId: number){
+    return await this.cardService.getCardByPacienteId(pacientId);
   }
 
   @Get('record/:recordId')
   async cardRecord(@Param('recordId', ParseIntPipe) recordId: number){
     return await this.cardService.getRecordById(recordId);
+  }
+
+  @Get('records/:cardId')
+  async cardRecords(@Param('cardId', ParseIntPipe) cardId: number){
+    return await this.cardService.getCardsRecords(cardId);
+  }
+
+  @Get(':cardId')
+  async cardById(@Param('id', ParseIntPipe) cardId: number){
+    return await this.cardService.getById(cardId);
   }
 
   @Post('record')

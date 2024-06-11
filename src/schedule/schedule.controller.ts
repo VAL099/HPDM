@@ -1,4 +1,4 @@
-import { Controller, Post, Get } from '@nestjs/common';
+import { Controller, Post, Get, Body } from '@nestjs/common';
 import { ScheduleService } from './schedule.service';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { ScheduleDTO } from './schedule.dto';
@@ -10,7 +10,7 @@ export class ScheduleController {
 
   @Post()
   @ApiBody({ type: ScheduleDTO})
-  async createSchedule(dto: ScheduleDTO){
+  async createSchedule(@Body() dto: ScheduleDTO){
     return this.scheduleService.create(dto);
   }
 

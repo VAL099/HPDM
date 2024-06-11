@@ -15,7 +15,7 @@ export class PacientController {
 
   @Post()
   @ApiBody({ type: PacientDTO })
-  async createPacient(dto: PacientDTO) {
+  async createPacient(@Body() dto: PacientDTO) {
     return this.pacientService.create(dto);
   }
 

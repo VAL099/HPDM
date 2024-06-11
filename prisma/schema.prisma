@@ -261,7 +261,7 @@ model MedicalCard {
 model MedicalCardRecord {
   id        Int      @id @default(autoincrement())
   cardId    Int
-  date      DateTime
+  date      DateTime @default(now())
   doctorId  Int
   diagnosis String
   treatment String? // html formatted string

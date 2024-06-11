@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
 import { InvestigationService, InvestigationFilesService } from './investigation.service';
 import { InvestigationDTO, InvestigationFilesDTO } from './investigation.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
@@ -13,7 +13,7 @@ export class InvestigationController {
 
   @Post()
   @ApiBody({ type: InvestigationDTO })
-  async create(dto: InvestigationDTO){
+  async create(@Body() dto: InvestigationDTO){
     return this.investigationService.create(dto);
   }
 
@@ -38,7 +38,7 @@ export class InvestigationController {
 
   @Post('/files')
   @ApiBody({ type: InvestigationFilesDTO })
-  async addFile(dto: InvestigationFilesDTO){
+  async addFile(@Body() dto: InvestigationFilesDTO){
     return this.investigationFilesService.create(dto);
   }
 

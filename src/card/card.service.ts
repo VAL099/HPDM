@@ -34,4 +34,16 @@ export class CardService {
         });
     }
 
+    async getCardByPacienteId(pacienteId: number){
+        return this.prisma.medicalCard.findFirst({
+            where: { pacientId: pacienteId, },
+        });
+    }
+
+    async getCardsRecords(cardId: number){
+        return this.prisma.medicalCardRecord.findMany({
+            where: { cardId: cardId, },
+        });
+    }
+
 }

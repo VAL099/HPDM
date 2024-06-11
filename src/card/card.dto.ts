@@ -12,10 +12,6 @@ export class MedicalCardRecordDTO {
     @ApiProperty()
     cardId: number;
 
-    @IsDate()
-    @ApiProperty()
-    date: Date;
-
     @IsInt()
     @ApiProperty()
     doctorId: number;

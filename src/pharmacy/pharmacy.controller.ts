@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { PharmacyService } from './pharmacy.service';
 import { PharmacyDto, PharmacyEmployeesDto } from './pharmacy.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
@@ -10,7 +10,7 @@ export class PharmacyController {
 
   @Post()
   @ApiBody({ type: PharmacyDto })
-  async create(dto: PharmacyDto){
+  async create(@Body() dto: PharmacyDto){
     return this.pharmacyService.create(dto);
   }
 
@@ -31,7 +31,7 @@ export class PharmacyController {
 
   @Post('/addEmployee')
   @ApiBody({ type: PharmacyDto })
-  async addEmployee(dto: PharmacyEmployeesDto){
+  async addEmployee(@Body() dto: PharmacyEmployeesDto){
     return this.pharmacyService.addEmployee(dto);
   }
 }

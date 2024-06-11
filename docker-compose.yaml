@@ -1,4 +1,3 @@
-version: '3.9'
 
 services:
   nginx:
@@ -13,16 +12,17 @@ services:
     networks:
       - citus
 
-  citus_master:
   # docker exec -it citus_master psql -U postgres -d hpdm_db -c "\dt"
+  citus_master:
     image: citusdata/citus:latest
+    ports:
+      - "5432:5432"
     container_name: citus_master
     environment:
       POSTGRES_DB: hpdm_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
+    command: ["postgres", "-c", "max_connections=2000"]
     depends_on:
       - citus_worker
     networks:
@@ -38,7 +38,7 @@ services:
       - citus
     
   backend:
-    image: hpdm_app
+    # image: hpdm_app
     build:
       context: .
       dockerfile: Dockerfile
@@ -51,19 +51,12 @@ services:
           delay: 10s
     depends_on:
       - citus_master
+      - citus_worker
     networks:
       - citus
+    restart: always
 
 networks:
   citus:
     driver: bridge
 
-# docker-compose up -d --scale backend=2 --scale citus_worker=2
-
-# 
-# # Get the names of the worker containers
-# docker ps --filter "name=citus_worker" --format "{{.Names}}"
-
-# in range of NODES:
-#   docker exec -it citus_master psql -U postgres -d hpdm_db -c "SELECT master_add_node('hpdm-citus_worker-{node}, 5432);"
-# 

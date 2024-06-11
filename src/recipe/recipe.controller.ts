@@ -1,4 +1,4 @@
-import { Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { RecipeService, ClosedRecipeService } from './recipe.service';
 import { ClosedRecipesDTO, RecipeDTO } from './recipe.dto';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
@@ -13,7 +13,7 @@ export class RecipeController {
 
   @Post()
   @ApiBody({ type: RecipeDTO })
-  async create(dto: RecipeDTO){
+  async create(@Body() dto: RecipeDTO){
     return this.recipeService.create(dto);
   }
 
@@ -29,7 +29,7 @@ export class RecipeController {
 
   @Post(':recipeId/close')
   async closeRecipe(@Param('recipeId', ParseIntPipe) recipeId: number, 
-                      dto: ClosedRecipesDTO){
+                      @Body() dto: ClosedRecipesDTO){
     this.recipeService.closeRecipe(recipeId);
     this.closeRecipeService.create({ ...dto, recipeId });
   }
