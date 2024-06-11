@@ -14,7 +14,7 @@ export class JwtMiddleware implements NestMiddleware {
   ) {}
 
   use(req: Request, res: Response, next: NextFunction) {
-    if (req.path.startsWith('/auth/')) {
+    if (req.path.startsWith('/auth')) {
       return next();
     }
 
@@ -27,7 +27,8 @@ export class JwtMiddleware implements NestMiddleware {
       const payload = this.jwtService.verify(token, {
         secret: this.configService.get<string>('JWT_SECRET'),
       });
-      req.idnp = payload;
+      console.log(req.body)
+      req.user = payload;
     } catch (error) {
       return res.status(401).json({ message: 'Unauthorized' });
     }

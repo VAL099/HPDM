@@ -12,9 +12,9 @@ export class AuthController {
     private readonly usersService: UsersService
   ) {}
 
+  @ApiBody({ type: UserLoginDTO })
   @UseGuards(AuthService)
   @Post('login')
-  @ApiBody({ type: UserLoginDTO })
   async login(@Req() req: Request, @Res() res: Response) {
     const { access_token } = await this.authService.login(req.body);
     res.cookie('jwt', access_token, { httpOnly: true });
