@@ -14,15 +14,17 @@ services:
       - citus
 
   traefik:
-    image: traefik:v2.5
+    image: traefik:latest
     container_name: traefik
     ports:
       - "80:80"
-      - "8050:8080"
+      - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     command:
-      - "--api.insecure=true"
+      - "--api=true"
+      - "--api.insecure=false"
+      - "--api.dashboard=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
