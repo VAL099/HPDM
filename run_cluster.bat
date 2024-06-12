@@ -1,5 +1,6 @@
 @echo off
 set replicas=7
+set /A citus_replicas=replicas/2
 set /A nginx_replicas=replicas/2
 
 

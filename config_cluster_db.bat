@@ -1,5 +1,5 @@
 @echo off
-set replicas=7
+set replicas=/A citus_replicas=7/2
 
 docker exec -it citus_master psql -U postgres -d hpdm_db -c "SELECT create_distributed_table('logs', 'id');"
 
